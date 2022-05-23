@@ -29,11 +29,18 @@ import numpy
 from io import StringIO
 import re
 
-def loadtxt2d(intext):
-	try:
-		return numpy.loadtxt(intext, ndmin=2)
-	except:
-		return numpy.loadtxt(intext)
+def loadtxt2d(file):
+    # count the columns in the first row of data
+    number_columns = numpy.genfromtxt(file, max_rows=1).shape[0]
+
+    c = lambda s: float(re.sub(r"(\d)([\+\-])(\d)", r"\1E\2\3", s.decode()))
+
+    # actually load the content of our file
+    data = numpy.genfromtxt(
+        file,
+        converters=dict(zip(range(number_columns), [c] * number_columns)),
+    )
+    return data
 
 class Analyzer(object):
 	"""
